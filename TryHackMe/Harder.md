@@ -144,7 +144,7 @@ Exploring further, I checked `/etc` and found **EVS’s password** inside the `p
 
 I used it to switch to **evs’s account**:
 
-![Capture d'écran 2025-02-15 221856](https://github.com/user-attachments/assets/1704d65d-efed-4d6c-b1db-5c53cf65f1d3)
+![Capture d'écran 2025-02-17 195125](https://github.com/user-attachments/assets/4987d045-e375-4807-a26d-9c5344d20a02)
 
 Next, I searched for **SUID binaries** using:
 ```
