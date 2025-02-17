@@ -138,7 +138,7 @@ I then looked for more information and found the **user flag**:
 
 ![Capture d'écran 2025-02-16 205348](https://github.com/user-attachments/assets/f67b16d8-8861-430c-b3a0-0444ba3a9974)
 
-Exploring further, I checked `/etc` and found **EVS’s password** inside the `periodic/evs-backup.sh` file :
+Exploring further, I checked `/etc` and found **evs’s password** inside the `periodic/evs-backup.sh` file :
 
 ![Capture d'écran 2025-02-16 205554](https://github.com/user-attachments/assets/527a5be9-c3c5-41b7-ad5f-b180ccead072)
 
