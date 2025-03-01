@@ -1,4 +1,4 @@
-# TryHackMe Writeups  
+# TryHackMe writeups  
 
 Welcome to my TryHackMe writeups! 🏴‍☠️  
 This folder contains solutions for various TryHackMe CTF challenges.
