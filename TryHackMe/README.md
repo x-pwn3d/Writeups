@@ -6,8 +6,8 @@ Each writeup provides insights into the steps taken to solve challenges, coverin
 
 
 ## 📝 Writeups List:  
-- [Challenge 1](./Harder.md)  
-- [Challenge 2](./Rabbit Store.md)  
+- [Harder](./Harder.md)  
+- [Rabbit Store](./Rabbit%20Store.md)  
 
 🚀 More writeups coming soon!  
 
