@@ -13,3 +13,9 @@ readme_index:
   enabled: true
   remove_originals: false
   with_frontmatter: true
+exclude:
+  - .gitignore
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
