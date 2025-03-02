@@ -4,8 +4,8 @@ description: "CTF Writeups for TryHackMe & Hack The Box"
 baseurl: "/Writeups"  
 url: "https://x-pwn3d.github.io"
 
-
 remote_theme: foodgy/jekyll-overreacted
 
 plugins:
   - jekyll-remote-theme
+  - jekyll-feed
