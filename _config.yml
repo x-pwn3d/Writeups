@@ -1,15 +1,15 @@
-title: "Writeups - x-pwn3d"
-author: "x-pwn3d"
+title: "Writeups"
 description: "CTF Writeups for TryHackMe & Hack The Box"
-baseurl: "/Writeups"  
-url: "https://x-pwn3d.github.io"
-
 remote_theme: foodgy/jekyll-overreacted
-
 plugins:
   - jekyll-remote-theme
-  - jekyll-paginate
+  - jekyll-readme-index
   - jekyll-seo-tag
-  - jekyll-feed
+  - jekyll-paginate
   - jekyll-sitemap
+  - jekyll-feed
   - jekyll-archives
+readme_index:
+  enabled: true
+  remove_originals: false
+  with_frontmatter: true
