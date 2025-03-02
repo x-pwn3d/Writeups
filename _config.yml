@@ -1,1 +1,11 @@
-theme: jekyll-dash
+title: "Writeups - x-pwn3d"
+author: "x-pwn3d"
+description: "CTF Writeups for TryHackMe & Hack The Box"
+baseurl: "/Writeups"  
+url: "https://x-pwn3d.github.io"
+
+
+remote_theme: foodgy/jekyll-overreacted
+
+plugins:
+  - jekyll-remote-theme
