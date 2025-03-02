@@ -8,4 +8,8 @@ remote_theme: foodgy/jekyll-overreacted
 
 plugins:
   - jekyll-remote-theme
+  - jekyll-paginate
+  - jekyll-seo-tag
   - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-archives
