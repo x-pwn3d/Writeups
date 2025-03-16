@@ -1,9 +1,3 @@
----
-title: "StuxCTF - TryHackMe"
-date: 2025-03-02
-categories: [TryHackMe]
-tags: [web, linux, enumeration, ssrf, ssti, rabbitmq, medium]
----
 ![Image](https://github.com/user-attachments/assets/fa31639d-0da5-4b54-adb9-cc160d445feb)
 
 Crypto, serealization, priv scalation and more ...!
@@ -11,7 +5,7 @@ Crypto, serealization, priv scalation and more ...!
 This machine is part of **TryHackMe** and is rated as a **medium**-level Linux challenge. It provides an excellent opportunity to practice skills in **web enumeration, cryptographic exploits, and privilege escalation**. Throughout the challenge, we will explore a vulnerable web application, exploit misconfigurations, and ultimately gain root access. Let's dive into the journey and uncover the secrets hidden within this machine!
 
 --- 
-### Recon
+### Initial enumeration
 
 To start, we add the target's IP address to our `/etc/hosts` file and perform a full port scan using **nmap** :
 
@@ -148,7 +142,7 @@ Now we can access to the **hidden** directory with `http://stux.thm:80/4731502[.
 It worked, and we've successfully discovered the hidden directory!
 
 --- 
-### Recon 2
+### Hidden directory enumeration
 
 At this point, we can start enumerating the new information we've gathered. Let's use `ffuf` to search for any **GET** parameters that could be vulnerable to **local file inclusion** (LFI) attacks or to simply identify a file access parameter.
 
@@ -417,7 +411,7 @@ Now that we have access, our next step is to retrieve the user flag.
 ![Image](https://github.com/user-attachments/assets/18db29f4-12cd-4aee-aaf5-974fb32e1565)
 
 --- 
-### Recon 3 
+### Post-exploitation enumeration
 
 Now, let's enumerate the system to better understand the environment and identify any vulnerabilities or misconfigurations that could lead us to the **root** flag.
 
