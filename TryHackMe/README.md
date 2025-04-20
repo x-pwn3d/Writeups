@@ -7,7 +7,8 @@ Each writeup provides insights into the steps taken to solve challenges, coverin
 
 ## 📝 Writeups List:  
 - [Harder](./Harder.md)  
-- [Rabbit Store](./RabbitStore.md)  
+- [Rabbit Store](./RabbitStore.md)
+- [StuxCTF](./StuxCTF.md)
 
 🚀 More writeups coming soon!  
 
