@@ -3,7 +3,7 @@
 
 ### Introduction
 
-This machine is part of **Hack The Box (HTB)** and is rated as an **easy**-level Linux challenge. It's an excellent opportunity to practice skills in **web enumeration, exploiting file upload vulnerabilities, and privilege escalation**. Throughout this challenge, we will explore a vulnerable web application, uncover misconfigurations, and ultimately escalate our privileges to gain root access. Let's dive into the journey and see how we can break into this system!
+This machine is part of **Hack The Box (HTB)** and is rated as an **easy**-level Linux challenge. It's an excellent opportunity to practice skills in **web enumeration, exploiting file upload vulnerabilities, and privilege escalation**. Throughout this challenge, we will explore a vulnerable web application, uncover misconfigurations and ultimately escalate our privileges to gain root access. Let's dive into the journey and see how we can break into this system!
 
 ---
 
