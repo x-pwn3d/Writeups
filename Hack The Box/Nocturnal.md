@@ -119,9 +119,10 @@ Let's see if we can connect to the Amanda's account to the nocturnal website :
 
 ![Capture d'écran 2025-04-20 163121](https://github.com/user-attachments/assets/254adc7b-091e-466a-9650-553a3ad5e983)
 
-And it works and we can also see that Amanda has an access to the **Admin Panel**.
+The login was successful, and we also noticed that Amanda has access to the **Admin Panel**.
+This reflects a **Broken Access Control** (Vertical Privilege Escalation) issue, the application failed to enforce user-level restrictions, letting us access files uploaded by higher-privileged accounts like Amanda.
 
-There is the **Admin Panel** and we can see the backup fonctionnality  : 
+The **Admin Panel** includes a feature to perform backups, which might be useful for further enumeration : 
 
 ![Capture d'écran 2025-04-20 163322](https://github.com/user-attachments/assets/5b633227-e487-4486-9692-a5160faa4587)
 
@@ -190,7 +191,7 @@ Finally, after successfully exploiting this vulnerability, we are able to read t
 
 --- 
 
-**Congratulations!** This challenge offered a great opportunity to practice web enumeration, exploiting file upload vulnerabilities, and privilege escalation techniques. From finding hidden backups to leveraging a vulnerable ISPConfig service, this CTF demonstrated how persistence and methodical testing can lead to root access.
+**Congratulations!** This challenge provided an excellent opportunity to practice web enumeration, exploiting file upload vulnerabilities, and privilege escalation techniques. From discovering a Broken Access Control vulnerability in file access to exploiting a vulnerable ISPConfig service, this CTF demonstrated how persistence and methodical testing can lead to root access.
 
 Thanks for reading, and happy hacking!
 
