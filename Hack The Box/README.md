@@ -8,6 +8,7 @@ Each writeup provides insights into the steps taken to solve challenges, coverin
 ## 📝 Writeups List:  
 - [Titanic](./Titanic.md)
 - [Nocturnal](./Nocturnal.md)
+- [Code](./Code.md)
 
 🚀 More writeups coming soon!  
 
