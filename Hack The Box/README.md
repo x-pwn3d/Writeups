@@ -9,6 +9,7 @@ Each writeup provides insights into the steps taken to solve challenges, coverin
 - [Titanic](./Titanic.md)
 - [Nocturnal](./Nocturnal.md)
 - [Code](./Code.md)
+- [Support](./Support.md)
 
 🚀 More writeups coming soon!  
 
