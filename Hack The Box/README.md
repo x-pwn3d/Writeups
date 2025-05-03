@@ -10,7 +10,7 @@ Each writeup provides insights into the steps taken to solve challenges, coverin
 - [Nocturnal](./Nocturnal.md)
 - [Code](./Code.md)
 - [Support](./Support.md)
-- [Dog](.Dog.md)
+- [Dog](./Dog.md)
 
 🚀 More writeups coming soon!  
 
