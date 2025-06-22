@@ -19,7 +19,7 @@ nmap 10.10.220.238 -Ss -sV -sC -p- -oN nmapres
 
 ![Capture d'écran 2025-06-22 123353](https://github.com/user-attachments/assets/8af2d187-b40a-4fed-9146-6bb4ef77df00)
 
-#### Nmap Results
+#### Nmap results
 
 - **Port 22 (SSH)** → OpenSSH 8.2p1
     
@@ -47,7 +47,7 @@ At this point, HTTPS appears to be the main attack surface.
 
 ---
 
-### Initial Enumeration (Gobuster & Dirsearch)
+### Initial enumeration (Gobuster & Dirsearch)
 
 Initial attempts with `gobuster` failed due to an expired SSL certificate :
 
@@ -83,7 +83,7 @@ No sensitive files exposed, but the server is revealing some clues about its str
 
 ---
 
-### SSL Certificate Analysis
+### SSL certificate analysis
 
 Accessing `https://futurevera.thm` in the browser triggers a certificate warning due to expiration :
 
@@ -101,7 +101,7 @@ We move forward by enumerating virtual hosts, as HTTPS-based subdomains are ofte
 
 ---
 
-### Subdomain Enumeration via VHost Fuzzing
+### Subdomain enumeration 
 
 We use `ffuf` with a wordlist and set the `Host` header manually:
 
@@ -153,7 +153,7 @@ We receive an immediate HTTP 302 Found response. The response includes a **Locat
 ![Capture d'écran 2025-06-22 145201](https://github.com/user-attachments/assets/9b00ca44-2a12-41a9-92d6-46145703b32b)
 
 ---
-### Conclusion
+
 
 **Congratulations!** I hope you found this write-up insightful. This CTF was a solid exercise in **careful SSL inspection**, **subdomain enumeration**, and **host header manipulation**.
 
