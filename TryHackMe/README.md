@@ -10,6 +10,7 @@ Each writeup provides insights into the steps taken to solve challenges, coverin
 - [Rabbit Store](./RabbitStore.md)
 - [StuxCTF](./StuxCTF.md)
 - [MD2PDF](./MD2PDF.md)
+- [TakeOver](./TakeOver.md)
 
 🚀 More writeups coming soon!  
 
