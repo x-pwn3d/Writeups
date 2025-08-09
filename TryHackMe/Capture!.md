@@ -3,7 +3,7 @@ Can you bypass the login form?
 
 This machine, named **Capture!**, is part of **TryHackMe** and rated as an **easy** challenge. It offers a great opportunity to practice fundamental web enumeration and brute force techniques while dealing with common protections like captchas. Throughout this challenge, we’ll explore how to identify valid usernames, automate captcha solving, and brute force passwords to gain access. Let’s dive in and walk through the process of capturing the flag step-by-step!
 
-You can find the full Python script used in this write-up at the following link :
+You can find the full Python script used in this write-up at the following link : [capture_thm.py](https://github.com/x-pwn3d/Writeups/blob/main/TryHackMe/scripts/capture_thm.py)
 
 ---
 ### Initial enumeration
