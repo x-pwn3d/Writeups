@@ -116,7 +116,7 @@ This script avoids the limitations of Hydra and can adapt to the captcha challen
 
 During the enumeration, we get output similar to this : 
 
-<img width="665" height="584" alt="Capture d'écran 2025-08-09 193526" src="https://github.com/user-attachments/assets/72b02fec-f14d-4179-9e69-abcfdd4832c6" />
+<img width="665" height="584" alt="Capture d'écran 2025-08-09 193526" src="https://github.com/user-attachments/assets/0076a249-3bda-47a0-80f1-f91e88bbd382" />
 
 As we can see, the script correctly identifies `<REDACTED>` as a **possible valid username** because the login response for `<REDACTED>` does not contain the “user does not exist” error, unlike all the others.
 
