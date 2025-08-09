@@ -4,8 +4,8 @@
 Welcome to my collection of Capture The Flag (CTF) writeups! This repository contains solutions, techniques, and insights from various CTF challenges I’ve worked on. It’s a work in progress as I continue to explore the exciting world of cybersecurity.
 
 ### 📂 Writeup Categories  
-- [TryHackMe Writeups](https://x-pwn3d.github.io/Writeups/TryHackMe/)
-- [Hack The Box Writeups](https://x-pwn3d.github.io/Writeups/Hack%20The%20Box/)
+- [TryHackMe Writeups](https://x-pwn3d.github.io/categories/tryhackme/)
+- [Hack The Box Writeups](https://x-pwn3d.github.io/categories/hack-the-box/)
 
 ## ℹ️ About  
 This repo includes writeups for challenges found on different online CTF platforms. The goal is to document my learning process, share solutions, and help others improve their skills in ethical hacking and cybersecurity.
