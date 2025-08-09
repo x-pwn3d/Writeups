@@ -11,6 +11,7 @@ Each writeup provides insights into the steps taken to solve challenges, coverin
 - [StuxCTF](./StuxCTF.md)
 - [MD2PDF](./MD2PDF.md)
 - [TakeOver](./TakeOver.md)
+- [Capture!](.Capture!.md)
 
 🚀 More writeups coming soon!  
 
