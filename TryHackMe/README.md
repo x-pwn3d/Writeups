@@ -12,7 +12,7 @@ Each writeup provides insights into the steps taken to solve challenges, coverin
 - [MD2PDF](./MD2PDF.md)
 - [TakeOver](./TakeOver.md)
 - [Capture!](./Capture!.md)
-- [Soupedecode 01)(./Soupedecode 01.md)
+- [Soupedecode 01)(./Soupedecode%2001.md)
 
 🚀 More writeups coming soon!  
 
